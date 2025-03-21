@@ -64,14 +64,14 @@
                     <p>Humedad: {{ order.humidity }}%</p>
                 {% endif %}
                 
-                {% if order.location %}
-                    <p>Ubicación: {{ order.location }}</p>
+                {% if order.proximity %}
+                    <p>Proximidad: {{ order.proximity }}</p>
                 {% endif %}
                 
                 <p>Estado: {{ order.status }}</p>
                 
                 <div class="metadata">
-                    <p>ID de Registro: {{ order._id }}</p>
+                    <p>ID de Registro: {{ order.id }}</p>
                     <p>Fecha y Hora: {{ order.timestamp }}</p>
                 </div>
             </div>
