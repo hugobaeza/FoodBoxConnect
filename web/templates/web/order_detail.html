@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Registro</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .detail-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .temp-normal {
+            color: green;
+            font-weight: bold;
+        }
+        .temp-warning {
+            color: orange;
+            font-weight: bold;
+        }
+        .temp-danger {
+            color: red;
+            font-weight: bold;
+        }
+        .metadata {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="detail-card">
+            <h1>Detalle de Registro</h1>
+            
+            <div class="order-details">
+                <h2>Box ID: {{ order.box_id }}</h2>
+                
+                {% if order.temperature <= 4 %}
+                    <p class="temp-normal">Temperatura: {{ order.temperature }}°C (Normal)</p>
+                {% elif order.temperature <= 8 %}
+                    <p class="temp-warning">Temperatura: {{ order.temperature }}°C (Advertencia)</p>
+                {% else %}
+                    <p class="temp-danger">Temperatura: {{ order.temperature }}°C (Peligro)</p>
+                {% endif %}
+                
+                {% if order.humidity %}
+                    <p>Humedad: {{ order.humidity }}%</p>
+                {% endif %}
+                
+                {% if order.location %}
+                    <p>Ubicación: {{ order.location }}</p>
+                {% endif %}
+                
+                <p>Estado: {{ order.status }}</p>
+                
+                <div class="metadata">
+                    <p>ID de Registro: {{ order._id }}</p>
+                    <p>Fecha y Hora: {{ order.timestamp }}</p>
+                </div>
+            </div>
+            
+            <a href="/orders/" class="back-button">Volver a la lista</a>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

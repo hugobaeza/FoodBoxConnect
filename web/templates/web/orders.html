@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo de FoodBox</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta http-equiv="refresh" content="30"> <!-- Actualizar cada 30 segundos -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .orders-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+        }
+        .order-card h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-open {
+            background-color: #4CAF50;
+        }
+        .status-closed {
+            background-color: #F44336;
+        }
+        .temp-normal {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .temp-warning {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        .temp-danger {
+            color: #F44336;
+            font-weight: bold;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+        .detail-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .detail-link:hover {
+            text-decoration: underline;
+        }
+        .proximity-indicator {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .proximity-close {
+            background-color: #E3F2FD;
+            color: #1976D2;
+        }
+        .proximity-far {
+            background-color: #FFEBEE;
+            color: #D32F2F;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monitoreo de FoodBox en Tiempo Real</h1>
+        
+        {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                    <div class="order-card">
+                        <h2>
+                            <span class="status-indicator {% if order.status == 'open' %}status-open{% else %}status-closed{% endif %}"></span>
+                            Box: {{ order.box_id }}
+                        </h2>
+                        
+                        <p>Estado: 
+                            {% if order.status == 'open' %}
+                                <span style="color: #4CAF50;">Abierto</span>
+                            {% else %}
+                                <span style="color: #F44336;">Cerrado</span>
+                            {% endif %}
+                        </p>
+                        
+                        {% if order.temperature <= 4 %}
+                            <p class="temp-normal">Temperatura: {{ order.temperature }}°C</p>
+                        {% elif order.temperature <= 8 %}
+                            <p class="temp-warning">Temperatura: {{ order.temperature }}°C</p>
+                        {% else %}
+                            <p class="temp-danger">Temperatura: {{ order.temperature }}°C</p>
+                        {% endif %}
+                        
+                        {% if order.humidity %}
+                            <p>Humedad: {{ order.humidity }}%</p>
+                        {% endif %}
+                        
+                        {% if order.proximity %}
+                            <div class="proximity-indicator {% if order.proximity == 'close' %}proximity-close{% else %}proximity-far{% endif %}">
+                                Proximidad: 
+                                {% if order.proximity == 'close' %}
+                                    Objeto cercano
+                                {% else %}
+                                    Sin objetos
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <p class="timestamp">Último registro: {{ order.timestamp }}</p>
+                        
+                        <a href="/orders/{{ order._id }}/" class="detail-link">Ver detalles</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 40px;">
+                <h2>No hay registros de temperatura disponibles</h2>
+                <p>Aún no se han recibido datos de ningún FoodBox.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
