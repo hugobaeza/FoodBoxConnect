@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
 from bson import ObjectId
-from models import *
+from .models import * 
 
 # Página web para mostrar los datos de temperatura
 def order_view(request, order_id=None):
