@@ -148,7 +148,7 @@
                         
                         <p class="timestamp">Último registro: {{ order.timestamp }}</p>
                         
-                        <a href="/orders/{{ order._id }}/" class="detail-link">Ver detalles</a>
+                        <a href="/orders/{{ order.id|default:'' }}/" class="detail-link">Ver detalles</a>
                     </div>
                 {% endfor %}
             </div>
