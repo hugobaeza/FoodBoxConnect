@@ -2,26 +2,51 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import logging
 from datetime import datetime
 from bson import ObjectId
-from .models import * 
+from db_con import db
+
+# Configurar logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
+
+# Colecciones de MongoDB
+boxes_collection = db["boxes"]
+orders_collection = db["orders"]
 
 # Página web para mostrar los datos de temperatura
 def order_view(request, order_id=None):
-    if order_id:
-        # Si se proporciona un ID de orden específico
-        try:
-            order = orders_collection.find_one({"_id": ObjectId(order_id)})
-            if order:
-                return render(request, 'web/order_detail.html', {'order': order})
-            else:
-                return render(request, 'web/error.html', {'message': 'Orden no encontrada'})
-        except Exception as e:
-            return render(request, 'web/error.html', {'message': str(e)})
-    else:
-        # Mostrar todas las órdenes
-        orders = list(orders_collection.find().sort("timestamp", -1))
-        return render(request, 'web/orders.html', {'orders': orders})
+    try:
+        if order_id:
+            # Si se proporciona un ID de orden específico
+            try:
+                order = orders_collection.find_one({"_id": ObjectId(order_id)})
+                if order:
+                    return render(request, 'web/order_detail.html', {'order': order})
+                else:
+                    return render(request, 'web/error.html', {'message': 'Orden no encontrada'})
+            except Exception as e:
+                logger.error(f"Error al obtener orden específica: {str(e)}")
+                return render(request, 'web/error.html', {'message': str(e)})
+        else:
+            # Mostrar todas las órdenes
+            try:
+                # Verificar si hay órdenes
+                count = orders_collection.count_documents({})
+                if count == 0:
+                    # No hay órdenes, mostrar página vacía
+                    return render(request, 'web/orders.html', {'orders': []})
+                
+                # Obtener todas las órdenes
+                orders = list(orders_collection.find().sort("timestamp", -1))
+                return render(request, 'web/orders.html', {'orders': orders})
+            except Exception as e:
+                logger.error(f"Error al obtener órdenes: {str(e)}")
+                return render(request, 'web/error.html', {'message': f'Error al acceder a la base de datos: {str(e)}'})
+    except Exception as general_error:
+        logger.error(f"Error general en order_view: {str(general_error)}")
+        return render(request, 'web/error.html', {'message': f'Error general: {str(general_error)}'})
 
 # API para obtener la información de una caja específica
 @csrf_exempt
@@ -40,6 +65,7 @@ def get_box_key(request, box_id):
                 "message": "Box no encontrada"
             }, status=404)
     except Exception as e:
+        logger.error(f"Error en get_box_key: {str(e)}")
         return JsonResponse({
             "status": "error",
             "message": str(e)
@@ -95,6 +121,7 @@ def register_temperature(request):
                 "message": "Formato JSON inválido"
             }, status=400)
         except Exception as e:
+            logger.error(f"Error en register_temperature: {str(e)}")
             return JsonResponse({
                 "status": "error", 
                 "message": str(e)
@@ -148,6 +175,7 @@ def get_box_status(request, box_id):
                 "message": "No hay registros para esta caja"
             })
     except Exception as e:
+        logger.error(f"Error en get_box_status: {str(e)}")
         return JsonResponse({
             "status": "error",
             "message": str(e)
