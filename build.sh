@@ -3,7 +3,10 @@
 # Actualiza pip
 pip install --upgrade pip
 
-# Instala las dependencias
+# Instala primero sqlparse con la versión exacta
+pip install sqlparse==0.2.4
+
+# Instala las demás dependencias
 pip install -r requirements.txt
 
 # Ejecuta las migraciones
