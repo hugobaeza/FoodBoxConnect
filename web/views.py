@@ -15,6 +15,12 @@ logger = logging.getLogger(__name__)
 boxes_collection = db["boxes"]
 orders_collection = db["orders"]
 
+# Función para transformar los documentos de MongoDB
+def transform_doc(doc):
+    if doc and '_id' in doc:
+        doc['id'] = str(doc['_id'])  # Agrega un campo 'id' con el string del _id
+    return doc
+
 # Página web para mostrar los datos de temperatura
 def order_view(request, order_id=None):
     try:
@@ -23,6 +29,8 @@ def order_view(request, order_id=None):
             try:
                 order = orders_collection.find_one({"_id": ObjectId(order_id)})
                 if order:
+                    # Transformar el documento para la plantilla
+                    order = transform_doc(order)
                     return render(request, 'web/order_detail.html', {'order': order})
                 else:
                     return render(request, 'web/error.html', {'message': 'Orden no encontrada'})
@@ -39,7 +47,11 @@ def order_view(request, order_id=None):
                     return render(request, 'web/orders.html', {'orders': []})
                 
                 # Obtener todas las órdenes
-                orders = list(orders_collection.find().sort("timestamp", -1))
+                orders_cursor = orders_collection.find().sort("timestamp", -1)
+                
+                # Transformar los documentos para la plantilla
+                orders = [transform_doc(order) for order in orders_cursor]
+                
                 return render(request, 'web/orders.html', {'orders': orders})
             except Exception as e:
                 logger.error(f"Error al obtener órdenes: {str(e)}")
