@@ -60,7 +60,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodboxconnect.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # Configuración para Django ORM
 DATABASES = {
@@ -74,8 +74,6 @@ DATABASES = {
 }
 
 # La conexión directa a MongoDB se maneja a través de db_con.py
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
