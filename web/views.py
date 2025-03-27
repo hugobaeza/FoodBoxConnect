@@ -95,7 +95,7 @@ def box_status(request):
             return JsonResponse({"status": "error", "message": "Número de serie requerido"}, status=400)
         
         # Buscar la caja por número de serie
-        box = boxes_collection.find_one({"serial_number": serial_number})
+        box = boxes_collection.find_one({"serie": serial_number})
         if not box:
             return JsonResponse({"status": "error", "message": "Caja no encontrada"}, status=404)
         
@@ -174,7 +174,7 @@ def update_verification(request):
                 return JsonResponse({"status": "error", "message": "Parámetros incompletos"}, status=400)
             
             # Buscar la caja por número de serie
-            box = boxes_collection.find_one({"serial_number": serial_number})
+            box = boxes_collection.find_one({"serie": serial_number})
             if not box:
                 return JsonResponse({"status": "error", "message": "Caja no encontrada"}, status=404)
             
