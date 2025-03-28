@@ -19,9 +19,17 @@ orders_collection = db["orders"]
 boxes_collection = db["boxes"]
 
 #ruta normal
+from django.http import JsonResponse
+from pymongo import MongoClient
+from bson import json_util
+
+# Ruta normal
 def home(request):
-    orders = list(orders_collection.find({}, {"_id": 0}))  # Excluir el campo _id si es necesario
+    # Obtener los datos de MongoDB
+    orders = list(orders_collection.find({}, {"_id": 0}))  # Excluir _id para evitar errores de serialización
+
     return JsonResponse({"orders": orders}, safe=False, json_dumps_params={'default': json_util.default})
+
 
 # Inicio de sesión
 @csrf_exempt
