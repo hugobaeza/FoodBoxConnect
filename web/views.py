@@ -20,8 +20,8 @@ boxes_collection = db["boxes"]
 
 #ruta normal
 def home(request):
-    orders = orders_collection.find()
-    return JsonResponse({"orders":orders})
+    orders = list(orders_collection.find({}, {"_id": 0}))  # Excluir el campo _id si es necesario
+    return JsonResponse({"orders": orders}, safe=False, json_dumps_params={'default': json_util.default})
 
 # Inicio de sesión
 @csrf_exempt
