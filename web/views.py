@@ -20,7 +20,7 @@ boxes_collection = db["boxes"]
 
 #ruta normal
 def home(request):
-    orders = list(orders_collection.find())
+    orders = orders_collection.find()
     return JsonResponse({"orders":orders})
 
 # Inicio de sesión
