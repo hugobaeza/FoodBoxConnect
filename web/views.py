@@ -25,10 +25,16 @@ from bson import json_util
 
 # Ruta normal
 def home(request):
-    # Obtener los datos de MongoDB
-    orders = list(orders_collection.find({}, {"_id": 0}))  # Excluir _id para evitar errores de serialización
+    return JsonResponse({"message": "API está funcionando"})
 
-    return JsonResponse({"orders": orders}, safe=False, json_dumps_params={'default': json_util.default})
+@csrf_exempt
+def test_api(request):
+    try:
+        # Test basic response
+        return JsonResponse({"status": "success", "message": "API test endpoint is working"})
+    except Exception as e:
+        logger.error(f"Error en test_api: {str(e)}")
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 
 # Inicio de sesión
