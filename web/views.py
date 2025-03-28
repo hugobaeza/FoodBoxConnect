@@ -18,6 +18,13 @@ users_collection = db["users"]
 orders_collection = db["orders"]
 boxes_collection = db["boxes"]
 
+
+
+#ruta normal
+def home(request):
+    orders = list(orders_collection.find())
+    return JsonResponse({"orders":orders})
+
 # Inicio de sesión
 @csrf_exempt
 def login(request):
