@@ -18,8 +18,6 @@ users_collection = db["users"]
 orders_collection = db["orders"]
 boxes_collection = db["boxes"]
 
-
-
 #ruta normal
 def home(request):
     orders = list(orders_collection.find())
@@ -104,7 +102,7 @@ def box_status(request):
         # Buscar la caja por número de serie
         box = boxes_collection.find_one({"serie": serial_number})
         if not box:
-            return JsonResponse({"status": "error", "message": "Caja no encontrada"}, status=404)
+            return JsonResponse({"status": "error", "message": f"Caja no encontrada con serie: {serial_number}"}, status=404)
         
         # Buscar el pedido asociado a la caja
         order = orders_collection.find_one({"id_box": box["_id"], "state": "pending"})
@@ -138,7 +136,7 @@ def update_temperature(request):
             # Buscar la caja por número de serie
             box = boxes_collection.find_one({"serie": serial_number})
             if not box:
-                return JsonResponse({"status": "error", "message": "Caja no encontrada"}, status=404)
+                return JsonResponse({"status": "error", "message": f"Caja no encontrada con serie: {serial_number}"}, status=404)
             
             # Actualizar la temperatura en la orden activa (si existe)
             order = orders_collection.find_one({"id_box": box["_id"], "state": "pending"})
@@ -183,7 +181,7 @@ def update_verification(request):
             # Buscar la caja por número de serie
             box = boxes_collection.find_one({"serie": serial_number})
             if not box:
-                return JsonResponse({"status": "error", "message": "Caja no encontrada"}, status=404)
+                return JsonResponse({"status": "error", "message": f"Caja no encontrada con serie: {serial_number}"}, status=404)
             
             # Buscar pedido activo
             order = orders_collection.find_one({"id_box": box["_id"], "state": "pending"})
@@ -202,16 +200,15 @@ def update_verification(request):
                 orders_collection.update_one(
                     {"_id": order["_id"]},
                     {
-                        "$set": {"state": "delivered", "delivery_date": datetime.now()},
+                        "$set": {"state": "completado", "delivery_date": datetime.now()},
                         "$push": {"access_logs": access_log}
                     }
                 )
                 
-                # Generar una nueva clave para futuros pedidos
-                new_box_key = generate_box_key()
+                # Actualizar la caja para indicar que el pedido fue completado
                 boxes_collection.update_one(
                     {"_id": box["_id"]},
-                    {"$set": {"last_access": datetime.now(), "next_box_key": new_box_key}}
+                    {"$set": {"last_access": datetime.now()}}
                 )
             else:
                 # Solo registrar el intento fallido
@@ -309,19 +306,19 @@ def register_box(request):
                 return JsonResponse({"status": "error", "message": "Número de serie requerido"}, status=400)
             
             # Verificar si la caja ya existe
-            existing_box = boxes_collection.find_one({"serial_number": serial_number})
+            existing_box = boxes_collection.find_one({"serie": serial_number})
             if existing_box:
                 return JsonResponse({"status": "error", "message": "La caja ya está registrada"}, status=400)
             
             # Crear nueva caja
             new_box = {
-                "serial_number": serial_number,
+                "serie": serial_number,
                 "position": position,
                 "status": "active",
                 "registration_date": datetime.now(),
                 "last_update": datetime.now(),
-                "current_temperature": 0,
-                "next_box_key": generate_box_key()
+                "temperatura": 0,
+                "on": 1
             }
             
             result = boxes_collection.insert_one(new_box)
