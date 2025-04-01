@@ -88,6 +88,7 @@ def get_order(request, order_key):
                     "details": order["details"],
                     "state": order["state"],
                     "dateTime": order["dateTime"],
+                    "box_key": order["box_key"],
                     "box_position": box.get("position", "Desconocida") if box else "Desconocida"
                 }
             })
